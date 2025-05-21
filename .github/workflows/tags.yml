@@ -2,7 +2,8 @@ name: CMake
 
 on:
  push:
-
+   tags:
+     - 'v*.*.*.*'
 
 jobs: 
 
