@@ -1,31 +1,32 @@
-name: CMake
+name: CMake Package and Release
 
 on:
- push:
-   tags:
-     - 'v*.*.*.*'
+  push:
+    tags:
+      - 'v*' 
 
-jobs: 
-
+jobs:
   build:
-
     runs-on: ubuntu-latest
-    
     permissions:
-      contents: write
+      contents: write  # Необходимо для создания релиза
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure Solver
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
       run: cmake -B build
-    - name: Build Solver
+
+    - name: Build
       run: cmake --build build
-    - name: Build package
+
+    - name: Build Package
       run: cmake --build build --target package
-    - name: Build source package
+
+    - name: Build Source Package
       run: cmake --build build --target package_source
 
-    - name: Make a release
+    - name: Create Release
       uses: ncipollo/release-action@v1.14.0
       with:
         artifacts: "build/*.deb,build/*.rpm,build/*.tar.gz,build/*.zip"
