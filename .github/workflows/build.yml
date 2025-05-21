@@ -14,8 +14,3 @@ jobs:
           cmake -B build
           cmake --build build
       
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: executable
-          path: build
