@@ -26,8 +26,6 @@ set(CPACK_RPM_PACKAGE_SUMMARY "solves equations")
 # Выбор генераторов в зависимости от ОС
 if(WIN32)
     set(CPACK_GENERATOR "WIX")
-    # Дополнительные настройки для MSI
-    # 👇 IMPORTANT: Replace this with a real, unique GUID 👇
     set(CPACK_WIX_PRODUCT_GUID "YOUR-UNIQUE-GUID-HERE-例えば-12345678-1234-1234-1234-1234567890AB")
     set(CPACK_WIX_UPGRADE_GUID "YOUR-UNIQUE-UPGRADE-GUID-HERE-例えば-ABCDEF01-ABCD-ABCD-ABCD-ABCDEF012345") # Also good to have a unique one
 elseif(APPLE)
