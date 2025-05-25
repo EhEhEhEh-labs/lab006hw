@@ -31,9 +31,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Configure
-      run: cmake -B build -DPRINT_VERSION=${{ env.GITHUB_REF_NAME_NO_V }} # Pass tag as version
+      run: cmake -B build -DPRINT_VERSION=${{ env.GITHUB_REF_NAME_NO_V }} 
       env:
-        GITHUB_REF_NAME_NO_V: ${{ github.ref_name }} # Bash syntax won't work directly, use env var
+        GITHUB_REF_NAME_NO_V: ${{ github.ref_name }} 
     - name: Build
       run: cmake --build build
     - name: Install WiX
@@ -45,17 +45,7 @@ jobs:
       with:
         name: windows-package
         path: build/packages/*.msi
-    # Post-process GITHUB_REF_NAME_NO_V in a Powershell step if complex manipulation is needed
-    # For simple 'v' removal for Windows, direct string manipulation in run step might be tricky.
-    # Simpler approach if CMake handles versioning internally based on Git tag or a file.
-    # For now, assuming PRINT_VERSION is handled by CMake or you can pass it like on Linux.
-    # Re-evaluating the -DPRINT_VERSION for windows, as direct shell expansion is tricky:
-    # Best practice: let CMake determine the version internally if possible or use an action to set env var.
-    # For simplicity, let's use the GITHUB_REF_NAME directly and have CMake strip 'v'.
-    # Configure step for Windows, revised for version passing:
-    # - name: Configure
-    #   run: cmake -B build -DPRINT_VERSION=${GITHUB_REF_NAME#v} # This syntax is bash, won't work in pwsh
-    # A robust way to pass version:
+
     - name: Set Version Environment Variable
       run: echo "PACKAGE_VERSION=${{ github.ref_name }}" | sed 's/v//' >> $GITHUB_ENV
     - name: Configure (Windows)
@@ -65,8 +55,6 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Configure
-      run: cmake -B build -DPRINT_VERSION=${GITHUB_REF_NAME#v} # Pass tag as version
     - name: Build
       run: cmake --build build
     - name: Create DMG
@@ -84,17 +72,14 @@ jobs:
       contents: write
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v4 # No 'name' needed, downloads all. It will create subdirectories.
+      uses: actions/download-artifact@v4 
       with:
         path: artifacts # All artifacts will be in artifacts/linux-packages, artifacts/windows-package etc.
     - name: Create Release
-      uses: ncipollo/release-action@v1 # Consider updating to a newer version if available/needed
+      uses: ncipollo/release-action@v1.16.0
       with:
-        artifacts: "artifacts/**/*" # This glob will find all packages in their subdirectories
+        artifacts: "artifacts/**/*" 
         token: ${{ secrets.GITHUB_TOKEN }}
-        # Optional: specify tag name if it's not automatically picked up from GITHUB_REF_NAME
-        # tagName: ${{ github.ref_name }}
-        # Optional: make it a draft release first
-        # draft: true
-        # Optional: auto-generate release notes
-        # generateReleaseNotes: true
+       
+        
+ 
