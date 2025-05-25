@@ -24,10 +24,11 @@ jobs:
       run: cmake --build build --target package
     - name: Build source package
       run: cmake --build build --target package_source
-
+    - run: cpack -G WIX
+    - run: cpack -G DragNDrop
     - name: Make a release
       uses: ncipollo/release-action@v1.16.0
       with:
-        artifacts: "build/*.deb,build/*.rpm,build/*.tar.gz,build/*.zip"
+        artifacts: "build/*.deb,build/*.rpm,build/*.tar.gz,build/*.zip,build/*.msi,build/*.dmg"
         token: ${{ secrets.GITHUB_TOKEN }}
         
