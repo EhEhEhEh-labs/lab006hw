@@ -1,33 +1,38 @@
-# CPackConfig.cmake
-
 include(InstallRequiredSystemLibraries)
 
-# Общие настройки
-set(CPACK_PACKAGE_CONTACT "booboo@boo.bo")
-set(CPACK_PACKAGE_VERSION "${PRINT_VERSION}") # Ensure PRINT_VERSION is set correctly in your CMakeLists.txt
-set(CPACK_PACKAGE_NAME "solver")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "static C++ library for solver")
-set(CPACK_PACKAGE_VENDOR "ghost")
-set(CPACK_PACKAGE_FILE_NAME "solver-${PRINT_VERSION}") # Base name for package files
+# Ensure PRINT_VERSION is defined before including this file (e.g., in CMakeLists.txt)
+if(NOT DEFINED PRINT_VERSION)
+    message(FATAL_ERROR "PRINT_VERSION is not set. Please define it in your CMakeLists.txt before including CPackConfig.cmake.")
+endif()
 
-# Настройки исходных пакетов
+# Common package settings
+set(CPACK_PACKAGE_CONTACT "booboo@boo.bo")
+set(CPACK_PACKAGE_VERSION "${PRINT_VERSION}")
+set(CPACK_PACKAGE_NAME "solver")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Static C++ library for solver")
+set(CPACK_PACKAGE_VENDOR "ghost")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PRINT_VERSION}")
+
+# Source package formats
 set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
 
-# Настройки Debian
-set(CPACK_DEBIAN_PACKAGE_PREDEPENDS "cmake >= 3.0")
+# Debian package settings
+set(CPACK_DEBIAN_PACKAGE_PREDEPENDS "cmake (>= 3.0)")
 set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all") # Consider "amd64" or similar if it's not architecture-independent
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "solves equations")
 
-# Настройки RPM
+# RPM package settings
 set(CPACK_RPM_PACKAGE_SUMMARY "solves equations")
-# Consider adding CPACK_RPM_PACKAGE_RELEASE and CPACK_RPM_PACKAGE_ARCHITECTURE
+set(CPACK_RPM_PACKAGE_RELEASE 1)
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "%{_arch}")
 
-# Выбор генераторов в зависимости от ОС
+# Generator selection by platform
 if(WIN32)
     set(CPACK_GENERATOR "WIX")
-    set(CPACK_WIX_PRODUCT_GUID "YOUR-UNIQUE-GUID-HERE-例えば-12345678-1234-1234-1234-1234567890AB")
-    set(CPACK_WIX_UPGRADE_GUID "YOUR-UNIQUE-UPGRADE-GUID-HERE-例えば-ABCDEF01-ABCD-ABCD-ABCD-ABCDEF012345") # Also good to have a unique one
+    # GUIDs should be stable across releases
+    set(CPACK_WIX_PRODUCT_GUID "YOUR-UNIQUE-PRODUCT-GUIDHERE-1234-1234-1234-1234567890AB")
+    set(CPACK_WIX_UPGRADE_GUID "YOUR-UNIQUE-UPGRADE-GUIDHERE-ABCD-ABCD-ABCD-ABCDEF012345")
 elseif(APPLE)
     set(CPACK_GENERATOR "DragNDrop")
 else()
