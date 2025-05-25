@@ -19,7 +19,7 @@ jobs:
         cmake --build build --target package
         cmake --build build --target package_source
     - name: Upload Linux artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: linux-packages
         path: |
@@ -39,7 +39,7 @@ jobs:
     - name: Build package
       run: cmake --build build --target package --config Release
     - name: Upload Windows artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-packages
         path: build/*.msi
@@ -55,7 +55,7 @@ jobs:
     - name: Build package
       run: cmake --build build --target package
     - name: Upload macOS artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: macos-packages
         path: build/*.dmg
@@ -67,7 +67,7 @@ jobs:
       contents: write
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
     - name: Create Release
