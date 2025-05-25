@@ -1,85 +1,53 @@
-name: CMake
-
+name: Release on Tag
 on:
   push:
     tags:
-      - 'v*.*.*.*'
+      - 'v*.*.*'
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v3
-    - name: Configure
-      run: cmake -B build 
-    - name: Build
-      run: cmake --build build
-    - name: Create Packages
-      run: |
-        cpack -G DEB
-        cpack -G RPM
-    - name: Upload Linux Packages
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-packages
-        path: |
-          build/*.deb
-          build/*.rpm
+      - uses: actions/checkout@v3
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Configure
-      run: cmake -B build -DPRINT_VERSION=${{ env.GITHUB_REF_NAME_NO_V }} 
-      env:
-        GITHUB_REF_NAME_NO_V: ${{ github.ref_name }} 
-    - name: Build
-      run: cmake --build build
-    - name: Install WiX
-      run: choco install wixtoolset
-    - name: Create MSI
-      run: cpack --project-directory build -B build/packages -G WIX
-    - name: Upload Windows Package
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-package
-        path: build/packages/*.msi
+      - name: Setup CMake
+        uses: lukka/get-cmake@v3
 
-    - name: Set Version Environment Variable
-      run: echo "PACKAGE_VERSION=${{ github.ref_name }}" | sed 's/v//' >> $GITHUB_ENV
-    - name: Configure (Windows)
-      run: cmake -B build -DPRINT_VERSION=${{ env.PACKAGE_VERSION }}
+      - name: Configure
+        run: |
+          cmake -B build -DPRINT_VERSION=${{ github.ref_name#v }}
 
-  build-macos:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cmake --build build
-    - name: Create DMG
-      run: cpack --project-directory build -B build/packages -G DragNDrop
-    - name: Upload macOS Package
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-package
-        path: build/packages/*.dmg
+      - name: Build
+        run: cmake --build build --config Release --parallel $(nproc)
+
+      - name: Package (CPack)
+        run: |
+          mkdir -p artifacts/${{ matrix.os }}
+          cpack --config build/CPackConfig.cmake -G ${% if runner.os == 'Windows' %}WIX${% elif runner.os == 'macOS' %}DragNDrop${% else %}DEB;RPM${% endif %} -B artifacts/${{ matrix.os }}
+
+      - name: Upload Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-packages
+          path: artifacts/${{ matrix.os }}
 
   create-release:
-    needs: [build-linux, build-windows, build-macos]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v4 
-      with:
-        path: artifacts # All artifacts will be in artifacts/linux-packages, artifacts/windows-package etc.
-    - name: Create Release
-      uses: ncipollo/release-action@v1.16.0
-      with:
-        artifacts: "artifacts/**/*" 
-        token: ${{ secrets.GITHUB_TOKEN }}
-       
-        
- 
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1.16.0
+        with:
+          tag: ${{ github.ref_name }}
+          artifacts: "all-artifacts/**/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
