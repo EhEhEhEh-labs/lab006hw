@@ -9,7 +9,6 @@ set(CPACK_PACKAGE_NAME "solver")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "static C++ library for solver")
 set(CPACK_PACKAGE_VENDOR "ghost")
 set(CPACK_PACKAGE_FILE_NAME "solver-${PRINT_VERSION}") # Base name for package files
-set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 # Настройки исходных пакетов
 set(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
