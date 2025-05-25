@@ -1,34 +1,28 @@
 name: CMake
-
 on:
  push:
    tags:
      - 'v*.*.*.*'
-
 jobs: 
-
   build:
-
-    runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
-
     steps:
     - uses: actions/checkout@v3
     - name: Configure Solver
       run: cmake -B build
     - name: Build Solver
       run: cmake --build build
-    - name: Build package
+    - name: Build packages
       run: cmake --build build --target package
     - name: Build source package
       run: cmake --build build --target package_source
-    - run: cpack -G WIX
-    - run: cpack -G DragNDrop
     - name: Make a release
       uses: ncipollo/release-action@v1.16.0
       with:
         artifacts: "build/*.deb,build/*.rpm,build/*.tar.gz,build/*.zip,build/*.msi,build/*.dmg"
         token: ${{ secrets.GITHUB_TOKEN }}
-        
