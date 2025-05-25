@@ -21,7 +21,7 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "solves equations")
 set(CPACK_RPM_PACKAGE_SUMMARY "solves equations")
 
 if(WIN32)
-  set(CPACK_GENERATOR "NSIS")
+  set(CPACK_GENERATOR "WIX")
 elseif(APPLE)
   set(CPACK_GENERATOR "DragNDrop")
 else()
